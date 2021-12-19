@@ -9,27 +9,35 @@ library(tidyverse)
 # Read files()
 getwd()
 
-setwd("./") #set to the working directory
+setwd("/Users/teohkhenghong/Desktop/RProjects/R-Individual-Assignment") #set to the working directory
 epldata = read.csv("england-premier-league-2019-to-2020.csv") #based on the current working directory
 View(epldata)
 
 class(epldata)
 str(epldata)
 
-# Step 2: Cleaning/Pre-processing
-# Cleaning/Pre-processing
-# Removing the Division, Date, Time, and betting providers' columns
-epldata = epldata[3:24];epldata
-
-# Step 3: Data Exploration & Manipulation
-
-
-# Analyse how many:
-
+# Original dataset
 # Number of Rows
 nrow(epldata)
 # Number of Columns
 ncol(epldata)
+
+# Step 2: Cleaning/Pre-processing
+# Cleaning/Pre-processing
+# Removing the Division, Date, Time, and betting providers' columns
+epldata = epldata[4:24];epldata
+
+# After removing uneccessary data:
+# View the dataset
+View(epldata)
+# Number of Rows
+nrow(epldata)
+# Number of Columns
+ncol(epldata)
+
+# Step 3: Data Exploration & Manipulation
+
+# Analyse how many:
 
 # Teams
 teamcolumns = c(epldata[["HomeTeam"]], epldata[["AwayTeam"]]);teamcolumns
@@ -44,53 +52,6 @@ referees = unique(epldata[["Referee"]]);referees
 # Number of Referees
 length(referees)
 
-# Grouping football teams (shots, goals, shots on target, offsides, yellow cards, red cards)
-homeTeamFactor = factor(epldata[["HomeTeam"]]);homeTeamFactor
-awayTeamFactor = factor(epldata[["AwayTeam"]]);awayTeamFactor
-
-# Total Goals
-# FTHG = Full Time Home Team Goals
-# FTAG = Full Time Away Team Goals
-
-homeTeamsSumGoals = tapply(epldata[['FTHG']], homeTeamFactor, sum);homeTeamsSumGoals
-awayTeamsSumGoals = tapply(epldata[['FTAG']], awayTeamFactor, sum);awayTeamsSumGoals
-
-# Team total goals
-teamSumGoals = homeTeamsSumGoals + awayTeamsSumGoals;teamSumGoals
-
-# View the total goals of each team for whole season
-View(teamSumGoals)
-
-# Football team that made the most shots for the whole season
-which.max(teamSumGoals)
-
-# Football team that made the least shots for the whole season
-which.min(teamSumGoals)
-
-# Average team goals
-averageTeamGoals = mean(teamSumGoals)
-
-# Max Goals
-# FTHG = Full Time Home Team Goals
-# FTAG = Full Time Away Team Goals
-# Max goals for each team made when they're as home team in a single match, in ascending alphabetical order
-homeTeamsMaxGoals = tapply(epldata[['FTHG']], homeTeamFactor, max);homeTeamsMaxGoals
-
-# Max goals for each team made when they're as away team in a single match, in ascending alphabetical order
-awayTeamsMaxGoals = tapply(epldata[['FTAG']], awayTeamFactor, max);awayTeamsMaxGoals
-
-# The team that made most/least goals as home team in a single match
-which.max(homeTeamsMaxGoals)
-which.min(homeTeamsMaxGoals)
-
-# The team that made most/least goals as away team in a single match
-which.max(awayTeamsMaxGoals)
-which.min(awayTeamsMaxGoals)
-
-# Average team max goals
-averageHomeTeamMaxGoals = mean(homeTeamsMaxGoals);averageHomeTeamMaxGoals
-averageAwayTeamMaxGoals = mean(awayTeamsMaxGoals);averageAwayTeamMaxGoals
-
 # Referee
 # Create a function to get mode of a vector.
 
@@ -102,6 +63,30 @@ getmode <- function(v) {
 
 # Which referee showed up the most in the whole season
 getmode(epldata[['Referee']])
+
+# Grouping football teams (shots, goals, shots on target, offsides, yellow cards, red cards)
+homeTeamFactor = factor(epldata[["HomeTeam"]]);homeTeamFactor
+awayTeamFactor = factor(epldata[["AwayTeam"]]);awayTeamFactor
+
+class(awayTeamFactor)
+str(awayTeamFactor)
+
+# Max Goals
+# FTHG = Full Time Home Team Goals
+# FTAG = Full Time Away Team Goals
+# Max goals for each team made when they're as home/away team in a single match, in ascending alphabetical order
+homeTeamsMaxGoals = tapply(epldata[['FTHG']], homeTeamFactor, max);homeTeamsMaxGoals
+awayTeamsMaxGoals = tapply(epldata[['FTAG']], awayTeamFactor, max);awayTeamsMaxGoals
+
+# The team that made most goals as home team in a single match
+which.max(homeTeamsMaxGoals);homeTeamsMaxGoals[[which.max(homeTeamsMaxGoals)]]
+
+# The team that made most goals as away team in a single match
+which.max(awayTeamsMaxGoals);awayTeamsMaxGoals[[which.max(awayTeamsMaxGoals)]]
+
+# Average team max goals
+averageHomeTeamMaxGoals = mean(homeTeamsMaxGoals);averageHomeTeamMaxGoals
+averageAwayTeamMaxGoals = mean(awayTeamsMaxGoals);averageAwayTeamMaxGoals
 
 # Full Time Goals
 # FTHG = Full Time Home Team Goals
@@ -124,6 +109,20 @@ fullTimeSumGoals = fullTimeHomeSumGoals + fullTimeAwaySumGoals;fullTimeSumGoals
 which.max(fullTimeSumGoals);fullTimeSumGoals[[which.max(fullTimeSumGoals)]]
 which.min(fullTimeSumGoals);fullTimeSumGoals[[which.min(fullTimeSumGoals)]]
 
+# Team Average goals
+averageFullTimeSumGoals = mean(fullTimeSumGoals);averageFullTimeSumGoals
+
+# Teams that are below average goals
+# A function to get the array elements that is below average
+getBelowAverageArrayNames <- function (x) {
+  average <- mean(x)
+  # https://stackoverflow.com/a/34584990
+  print(paste('Average is: ', average))
+  return (names(x[x < average]))
+}
+
+getBelowAverageArrayNames(fullTimeSumGoals)
+
 # Shots
 # HS = Home Team Shots
 # AS = Away Team Shots
@@ -137,7 +136,10 @@ fullTimeSumShots = fullTimeHomeSumShots + fullTimeAwaySumShots;fullTimeSumShots
 which.max(fullTimeSumShots);fullTimeSumShots[[which.max(fullTimeSumShots)]]
 which.min(fullTimeSumShots);fullTimeSumShots[[which.min(fullTimeSumShots)]]
 
-names(fullTimeSumShots)[which.max(fullTimeSumShots)]
+# The team that scored the most
+# Get the name of the array. Reference: https://stackoverflow.com/a/21422242
+names(fullTimeSumShots)[which.max(fullTimeSumShots)];fullTimeSumShots[[which.max(fullTimeSumShots)]]
+names(fullTimeSumShots)[which.min(fullTimeSumShots)];fullTimeSumShots[[which.min(fullTimeSumShots)]]
 
 sumShotsDifference = fullTimeSumShots[[which.max(fullTimeSumShots)]] - fullTimeSumShots[[which.min(fullTimeSumShots)]];sumShotsDifference
 
@@ -150,11 +152,19 @@ fullTimeAwaySumShotsOnTarget = tapply(epldata[['AST']], awayTeamFactor, sum);ful
 fullTimeSumShotsOnTarget = fullTimeHomeSumShotsOnTarget + fullTimeAwaySumShotsOnTarget;fullTimeSumShotsOnTarget
 
 # Which team made most/least shots on target in the whole season?
-which.max(fullTimeSumShotsOnTarget);fullTimeSumShotsOnTarget[[which.max(fullTimeSumShotsOnTarget)]]
-which.min(fullTimeSumShotsOnTarget);fullTimeSumShots[[which.min(fullTimeSumShotsOnTarget)]]
+names(fullTimeSumShotsOnTarget)[which.max(fullTimeSumShotsOnTarget)];fullTimeSumShotsOnTarget[[which.max(fullTimeSumShotsOnTarget)]]
+names(fullTimeSumShotsOnTarget)[which.min(fullTimeSumShotsOnTarget)];fullTimeSumShotsOnTarget[[which.min(fullTimeSumShotsOnTarget)]]
+
+# Difference
+shotsOnTargetDifference = fullTimeSumShotsOnTarget[[which.max(fullTimeSumShotsOnTarget)]] - fullTimeSumShotsOnTarget[[which.min(fullTimeSumShotsOnTarget)]];shotsOnTargetDifference
 
 # Average shots on target
 mean(fullTimeSumShotsOnTarget)
+
+# Teams that made below average shots on target
+belowAverageShotsOnTargetTeamNames = getBelowAverageArrayNames(fullTimeSumShotsOnTarget);belowAverageShotsOnTargetTeamNames
+length(belowAverageShotsOnTargetTeamNames)
+fullTimeSumShotsOnTarget[belowAverageShotsOnTargetTeamNames]
 
 # Corners
 # HC = Home Team Corner
@@ -165,11 +175,19 @@ fullTimeAwaySumCorner = tapply(epldata[['AC']], awayTeamFactor, sum);fullTimeAwa
 fullTimeSumCorner = fullTimeHomeSumCorner + fullTimeAwaySumCorner;fullTimeSumCorner
 
 # Team that did most/least corners in thw whole season.
-which.max(fullTimeSumCorner);fullTimeSumCorner[[which.max(fullTimeSumCorner)]]
-which.min(fullTimeSumCorner);fullTimeSumCorner[[which.min(fullTimeSumCorner)]]
+names(fullTimeSumCorner)[which.max(fullTimeSumCorner)];fullTimeSumCorner[[which.max(fullTimeSumCorner)]]
+names(fullTimeSumCorner)[which.min(fullTimeSumCorner)];fullTimeSumCorner[[which.min(fullTimeSumCorner)]]
+
+# Difference
+cornersDifference = fullTimeSumCorner[[which.max(fullTimeSumCorner)]] - fullTimeSumCorner[[which.min(fullTimeSumCorner)]];cornersDifference
 
 # Average team corners in the whole season.
 mean(fullTimeSumCorner)
+
+# Below average corners
+belowAverageCornersTeamNames = getBelowAverageArrayNames(fullTimeSumCorner);belowAverageCornersTeamNames
+length(belowAverageCornersTeamNames)
+fullTimeSumCorner[belowAverageCornersTeamNames]
 
 # Yellow cards
 # HY = Home Team Yellow Cards
@@ -186,6 +204,18 @@ which.min(sumYellowCards);sumYellowCards[[which.min(sumYellowCards)]]
 # Average Yellow cards
 mean(sumYellowCards)
 
+# A function to get the array elements that is above average
+getAboveAverageArrayNames <- function (x) {
+  average <- mean(x)
+  print(paste('Average is: ', average))
+  return (names(x[x > average]))
+}
+
+# Which team got above average yellow cards?
+aboveAverageYellowCardTeamNames = getAboveAverageArrayNames(sumYellowCards);aboveAverageYellowCardTeamNames
+length(aboveAverageYellowCardTeamNames)
+sumYellowCards[aboveAverageYellowCardTeamNames]
+
 # Red cards
 # HR = Home Team Red Cards
 # AR = Away Team Red Cards
@@ -194,67 +224,150 @@ awaySumRedCards = tapply(epldata[['AR']], homeTeamFactor, sum);awaySumRedCards
 
 sumRedCards = homeSumRedCards + awaySumRedCards;sumRedCards
 
-# Team that got the most/least yellow cards in thw whole season.
+# Team that got the most yellow cards in thw whole season.
 which.max(sumRedCards);sumRedCards[[which.max(sumRedCards)]]
-which.min(sumRedCards);sumYellowCards[[which.min(sumRedCards)]]
 
-# Average Red cards
-mean(sumRedCards)
+# Teams that got no Red cards in the whole season
+sumRedCards[sumRedCards == 0]
 
-# Count shots efficiency
+# Which team won in the season
 
+# FTR: Full Time Result. H = Home Team Win, A = Away Team Win, D = Draw
+
+# Functions that calculate the points of the home/away teams based on the record values.
+calculateHomeTeamPoints = function(x) {
+  homeWins = length(x[x == 'H'])
+  draws = length(x[x == 'D'])
+  homePoints = homeWins * 3
+  drawPoints = draws * 1
+  points = homePoints + drawPoints
+  return (points)
+}
+
+calculateAwayTeamPoints = function(x) {
+  awayWins = length(x[x == 'A'])
+  draws = length(x[x == 'D'])
+  awayPoints = awayWins * 3
+  drawPoints = draws * 1
+  points = awayPoints + drawPoints
+  return (points)
+}
+
+sumHomeTeamPoints = tapply(epldata[['FTR']], homeTeamFactor, calculateHomeTeamPoints);sumHomeTeamPoints
+sumAwayTeamPoints = tapply(epldata[['FTR']], awayTeamFactor, calculateAwayTeamPoints);sumAwayTeamPoints
+
+sumTeamPoints = sumHomeTeamPoints + sumAwayTeamPoints;sumTeamPoints
+
+# Who is the 1st place(won) in the whole season?
+sumTeamPoints[which.max(sumTeamPoints)]
+
+# Who is the last place in the whole season?
+sumTeamPoints[which.min(sumTeamPoints)]
+
+# Create Visualizations
 # Step 1: Create tibbles
 fullTimeShots = tibble(data.frame(teams, shots=fullTimeSumShots));fullTimeShots
 fullTimeShotsOnTarget = tibble(data.frame(teams, shots=fullTimeSumShotsOnTarget));fullTimeShotsOnTarget
 teamGoals = tibble(data.frame(teams, shots=teamSumGoals));teamGoals
-teamCorners = tibble(data.frame(teams, shots=fullTimeSumCorner));teamCorners
-yellowCards = tibble(data.frame(teams, shots=yellowCards));yellowCards
-redCards = tibble(data.frame(teams, shots=sumRedCards));redCards
-
+teamCorners = tibble(data.frame(teams, corners=fullTimeSumCorner));teamCorners
+yellowCards = tibble(data.frame(teams, cards=sumYellowCards));yellowCards
+redCards = tibble(data.frame(teams, cards=sumRedCards));redCards
 
 # Step 2: Create plots
 # Full Time Shots Barplot
 ggplot(fullTimeShots, aes(teams,shots, fill=rainbow(length(teams)))) +
   geom_col(show.legend = FALSE) +
-  labs(title = 'Full Time Shots', subtitle = 'Total Shots of every team in the whole season', y = 'Shots', x = 'Team Name')
+  geom_hline(aes(yintercept=mean(fullTimeSumShots))) +
+  labs(title = 'Full Time Shots', subtitle = 'Total Shots of every team in the whole season', y = 'Shots', x = 'Team Name') +
+  coord_flip()
 
 # Full Time Shots on Target Barplot
 ggplot(fullTimeShotsOnTarget, aes(teams,shots, fill=rainbow(length(teams)))) +
   geom_col(show.legend = FALSE) +
-  labs(title = 'Full Time Shots on Target', subtitle = 'Total Shots on Target of every team in the whole season', y = 'Shots', x = 'Team Name')
+  geom_hline(aes(yintercept=mean(fullTimeSumShotsOnTarget))) +
+  labs(title = 'Full Time Shots on Target', subtitle = 'Total Shots on Target of every team in the whole season', y = 'Shots', x = 'Team Name') +
+  coord_flip()
 
 # Full Time Goals Barplot
 ggplot(teamGoals, aes(teams,shots, fill=rainbow(length(teams)))) +
   geom_col(show.legend = FALSE) +
-  labs(title = 'Full Time Goals', subtitle = 'Total Goals of every team in the whole season', y = 'Shots', x = 'Team Name')
+  geom_hline(aes(yintercept=mean(teamSumGoals))) +
+  labs(title = 'Full Time Goals', subtitle = 'Total Goals of every team in the whole season', y = 'Shots', x = 'Team Name') +
+  coord_flip()
 
 # Team Corner Barplot
-ggplot(teamCorners, aes(teams,shots, fill=rainbow(length(teams)))) +
+ggplot(teamCorners, aes(teams,corners, fill=rainbow(length(teams)))) +
   geom_col(show.legend = FALSE) +
-  labs(title = 'Team Corners', subtitle = 'Total Corner of every team in the whole season', y = 'Corners', x = 'Team Name')
+  geom_hline(aes(yintercept=mean(fullTimeSumCorner))) +
+  labs(title = 'Team Corners', subtitle = 'Total Corner of every team in the whole season', y = 'Corners', x = 'Team Name') +
+  coord_flip()
 
 # Team Yellow Cards Barplot
-ggplot(yellowCards, aes(teams,shots, fill=rainbow(length(teams)))) +
+ggplot(yellowCards, aes(teams,cards, fill=rainbow(length(teams)))) +
   geom_col(show.legend = FALSE) +
-  labs(title = 'Team Yellow Cards', subtitle = 'Total Yellow Cards of every team in the whole season', y = 'Yellow Cards', x = 'Team Name')
+  geom_hline(aes(yintercept=mean(sumYellowCards))) +
+  labs(title = 'Team Yellow Cards', subtitle = 'Total Yellow Cards of every team in the whole season', y = 'Yellow Cards', x = 'Team Name') +
+  coord_flip()
 
 # Team Red Cards Barplot
-ggplot(redCards, aes(teams,shots, fill=rainbow(length(teams)))) +
+ggplot(redCards, aes(teams,cards, fill=rainbow(length(teams)))) +
   geom_col(show.legend = FALSE) +
-  labs(title = 'Team Red Cards', subtitle = 'Total Red Cards of every team in the whole season', y = 'Red Cards', x = 'Team Name')
+  geom_hline(aes(yintercept=mean(sumRedCards))) +
+  labs(title = 'Team Red Cards', subtitle = 'Total Red Cards of every team in the whole season', y = 'Red Cards', x = 'Team Name') +
+  coord_flip()
 
 
+# Perform point analysis of each team.
+calculateHomeWins = function(x) {
+  return (length(x[x == 'H']))
+}
 
+calculateAwayWins = function(x) {
+  return (length(x[x == 'A']))
+}
 
-# How many betting providers
+calculateDraws = function(x) {
+  return (length(x[x == 'D']))
+}
 
-# Who won in the end
-# Which team shots the most (in home team/away team/together)
-# What is the average betting odds in each team (Home goal/Draw/Away team goal) (group by different betting providers)
+homeTeamWins = tapply(epldata[['FTR']], homeTeamFactor, calculateHomeWins);homeTeamWins
+awayTeamWins = tapply(epldata[['FTR']], awayTeamFactor, calculateAwayWins);awayTeamWins
+homeTeamDraws = tapply(epldata[['FTR']], homeTeamFactor, calculateDraws);homeTeamDraws
+awayTeamDraws = tapply(epldata[['FTR']], awayTeamFactor, calculateDraws);awayTeamDraws
 
-# More home team or away won the matches in the whole season?
+stats = data.frame(teamNames=teams, homeWins=homeTeamWins*3, awayWins=awayTeamWins*3, homeDraws=homeTeamDraws, awayDraws=awayTeamDraws);stats
 
+# Flatten the multi columns in data frame in order to create group bar plot
+# Reference: https://stackoverflow.com/a/10213993
+install.packages('reshape2')
+library(reshape2)
+teamDraws2 = melt(stats);teamDraws2
 
+length(stats$teamNames)
+
+# Stacked barplot
+ggplot(teamDraws2, aes(fill=variable, y=value, x=teamNames)) + 
+  geom_bar(stat="identity") +
+  coord_flip()
+
+# Grouped barplot
+ggplot(teamDraws2, aes(fill=variable, y=value, x=teamNames)) + 
+  geom_bar(position="dodge", stat="identity") +
+  coord_flip()
+
+# Pearson Relationship between 2 variables
+
+# Shots vs Shots on Target
+cor(fullTimeShots$shots, fullTimeShotsOnTarget$shots)
+
+# Shots On Target vs Goals
+cor(fullTimeShotsOnTarget$shots, teamGoals$shots)
+
+# Corner vs Goals
+cor(teamCorners$corners, teamGoals$shots)
+
+# Yellow cards vs Red cards
+cor(yellowCards$cards, redCards$cards)
 
 
 
