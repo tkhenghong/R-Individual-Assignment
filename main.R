@@ -182,7 +182,7 @@ fullTimeAwaySumCorner = tapply(epldata[['AC']], awayTeamFactor, sum);fullTimeAwa
 
 fullTimeSumCorner = fullTimeHomeSumCorner + fullTimeAwaySumCorner;fullTimeSumCorner
 
-# Team that did most/least corners in thw whole season.
+# Team that did most/least corners in the whole season.
 names(fullTimeSumCorner)[which.max(fullTimeSumCorner)];fullTimeSumCorner[[which.max(fullTimeSumCorner)]]
 names(fullTimeSumCorner)[which.min(fullTimeSumCorner)];fullTimeSumCorner[[which.min(fullTimeSumCorner)]]
 
@@ -205,7 +205,7 @@ awaySumYellowCards = tapply(epldata[['AY']], homeTeamFactor, sum);awaySumYellowC
 
 sumYellowCards = homeSumYellowCards + awaySumYellowCards ;sumYellowCards
 
-# Team that got the most/least yellow cards in thw whole season.
+# Team that got the most/least yellow cards in the whole season.
 which.max(sumYellowCards);sumYellowCards[[which.max(sumYellowCards)]]
 which.min(sumYellowCards);sumYellowCards[[which.min(sumYellowCards)]]
 
@@ -232,7 +232,7 @@ awaySumRedCards = tapply(epldata[['AR']], homeTeamFactor, sum);awaySumRedCards
 
 sumRedCards = homeSumRedCards + awaySumRedCards;sumRedCards
 
-# Team that got the most yellow cards in thw whole season.
+# Team that got the most yellow cards in the whole season.
 which.max(sumRedCards);sumRedCards[[which.max(sumRedCards)]]
 
 # Teams that got no Red cards in the whole season
