@@ -1,9 +1,17 @@
 # TEOH KHENG HONG TP030562
 # IRP Individual Assignment
 
+# Load R Data
+load('data.RData')
+
 # Installing tidyverse
 install.packages("tidyverse")
 library(tidyverse)
+
+# Flatten the multi columns in data frame in order to create group bar plot
+# Reference: https://stackoverflow.com/a/10213993
+install.packages('reshape2')
+library(reshape2)
 
 # Step 1: Import Data
 # Read files()
@@ -337,10 +345,6 @@ awayTeamDraws = tapply(epldata[['FTR']], awayTeamFactor, calculateDraws);awayTea
 
 stats = data.frame(teamNames=teams, homeWins=homeTeamWins*3, awayWins=awayTeamWins*3, homeDraws=homeTeamDraws, awayDraws=awayTeamDraws);stats
 
-# Flatten the multi columns in data frame in order to create group bar plot
-# Reference: https://stackoverflow.com/a/10213993
-install.packages('reshape2')
-library(reshape2)
 teamDraws2 = melt(stats);teamDraws2
 
 length(stats$teamNames)
@@ -355,7 +359,7 @@ ggplot(teamDraws2, aes(fill=variable, y=value, x=teamNames)) +
   geom_bar(position="dodge", stat="identity") +
   coord_flip()
 
-# Pearson Relationship between 2 variables
+# Pearson Correlations Relationship between 2 variables
 
 # Shots vs Shots on Target
 cor(fullTimeShots$shots, fullTimeShotsOnTarget$shots)
@@ -368,8 +372,4 @@ cor(teamCorners$corners, teamGoals$shots)
 
 # Yellow cards vs Red cards
 cor(yellowCards$cards, redCards$cards)
-
-
-
-
 
